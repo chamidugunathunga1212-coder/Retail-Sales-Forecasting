@@ -1,4 +1,0 @@
-[ 2026-01-16 14:54:52,868 ] - root - INFO - Starting Walmart data ingestion
-[ 2026-01-16 14:54:53,053 ] - root - INFO - Raw data files loaded
-[ 2026-01-16 14:54:53,224 ] - root - INFO - Datasets merged successfully
-[ 2026-01-16 14:55:01,419 ] - root - INFO - Data ingestion completed successfully

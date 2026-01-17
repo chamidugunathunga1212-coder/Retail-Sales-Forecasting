@@ -1,0 +1,36 @@
+dataset:
+  name: walmart_sales
+
+target_column:
+  name: Weekly_Sales
+
+date_column: Date
+
+required_columns:
+  - Store
+  - Dept
+  - Date
+  - Weekly_Sales
+  - IsHoliday
+  - Temperature
+  - Fuel_Price
+  - CPI
+  - Unemployment
+  - Type
+  - Size
+
+optional_columns:
+  - MarkDown1
+  - MarkDown2
+  - MarkDown3
+  - MarkDown4
+  - MarkDown5
+
+quality_rules:
+  allow_duplicates: true
+  max_missing_ratio_per_column: 0.80
+  max_total_missing_ratio: 0.50
+  target_non_negative: true
+
+  # Date parsing tolerance (1% invalid dates allowed)
+  max_date_nat_ratio: 0.01
