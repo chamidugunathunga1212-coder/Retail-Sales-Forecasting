@@ -1,1 +1,12 @@
 venv
+
+# Artifacts / generated outputs
+artifacts/
+*.npy
+*.pkl
+*.joblib
+*.csv
+*.parquet
+mlruns/
+__pycache__/
+*.log
