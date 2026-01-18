@@ -46,7 +46,7 @@ class DataValidation:
             raise CustomerException(e,sys)
 
     
-    def validate_columns(self,df:pd.DataFrame,required_cols:List[str],optional_cols:List[str])->Dict[str,Any]:
+    def _validate_columns(self,df:pd.DataFrame,required_cols:List[str],optional_cols:List[str])->Dict[str,Any]:
         try:
             
             df_cols = set(df.columns)
@@ -70,7 +70,7 @@ class DataValidation:
             "extra_columns": extra,
         }
     
-    def validate_date_column(self,df:pd.DataFrame,date_col:str,max_nat_ratio: float)->Dict[str, Any]:
+    def _validate_date_column(self,df:pd.DataFrame,date_col:str,max_nat_ratio: float)->Dict[str, Any]:
         try:
             
             if not date_col or date_col not in df.columns:
@@ -194,11 +194,11 @@ class DataValidation:
                 "overall_status": True,
             }
 
-            train_cols = self.validate_columns(df=train_df,required_cols=required_cols,optional_cols=optional_cols)
+            train_cols = self._validate_columns(df=train_df,required_cols=required_cols,optional_cols=optional_cols)
             train_dups = self._validate_duplicates(df=train_df,allow_duplicates=allow_duplicates)
             train_quality = self._quality_rules_check(df=train_df,rules=rules)
             train_target = self._validate_target(df=train_df,target_col=target_col,non_negative=target_non_negative)
-            train_date = self.validate_date_column(df=train_df,date_col=date_col,max_nat_ratio=max_nat_ratio)
+            train_date = self._validate_date_column(df=train_df,date_col=date_col,max_nat_ratio=max_nat_ratio)
 
             report["train"] = {
                 "columns": train_cols,
@@ -210,11 +210,11 @@ class DataValidation:
                 "cols": int(train_df.shape[1]),
             }
 
-            test_cols = self.validate_columns(df=test_df,required_cols=required_cols,optional_cols=optional_cols)
+            test_cols = self._validate_columns(df=test_df,required_cols=required_cols,optional_cols=optional_cols)
             test_dups = self._validate_duplicates(df=test_df,allow_duplicates=allow_duplicates)
             test_quality = self._quality_rules_check(df=test_df,rules=rules)
             test_target = self._validate_target(df=test_df,target_col=target_col,non_negative=target_non_negative)
-            test_date = self.validate_date_column(df=test_df,date_col=date_col,max_nat_ratio=max_nat_ratio)
+            test_date = self._validate_date_column(df=test_df,date_col=date_col,max_nat_ratio=max_nat_ratio)
 
             report["test"] = {
                 "columns": test_cols,
@@ -247,7 +247,7 @@ class DataValidation:
             os.makedirs(os.path.dirname(self.data_validation_config.validated_test_file_path), exist_ok=True)
 
             train_df.to_csv(self.data_validation_config.validated_train_file_path, index=False)
-            test_df.to_csv(self.data_validation_config.validated_train_file_path, index=False)
+            test_df.to_csv(self.data_validation_config.validated_test_file_path, index=False)
 
             logging.info(f"Data Validation completed. Status: {overall_status}")
 

@@ -1,0 +1,66 @@
+# -----------------------------
+# Feature Engineering Config
+# -----------------------------
+
+target_column: Weekly_Sales
+date_column: Date
+
+# -----------------------------
+# Column Groups
+# -----------------------------
+categorical_columns:
+  - Store
+  - Dept
+  - Type
+  - IsHoliday
+
+numerical_columns:
+  - Temperature
+  - Fuel_Price
+  - MarkDown1
+  - MarkDown2
+  - MarkDown3
+  - MarkDown4
+  - MarkDown5
+  - CPI
+  - Unemployment
+  - Size
+
+# -----------------------------
+# Date Feature Engineering
+# -----------------------------
+date_features:
+  enabled: true
+  features:
+    - year
+    - month
+    - weekofyear
+    - dayofweek
+    - is_month_start
+    - is_month_end
+
+# -----------------------------
+# Target Transformation
+# -----------------------------
+target_transform:
+  type: log1p   # options: log1p | none
+
+# -----------------------------
+# Missing Value Handling
+# -----------------------------
+numerical_imputer:
+  strategy: median
+
+categorical_imputer:
+  strategy: most_frequent
+
+# -----------------------------
+# Scaling & Encoding
+# -----------------------------
+scaling:
+  enabled: true
+  method: standard   # standard | minmax
+
+encoding:
+  method: onehot     # onehot only (safe for prod)
+  handle_unknown: ignore

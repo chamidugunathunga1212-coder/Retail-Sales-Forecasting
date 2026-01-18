@@ -1,0 +1,5 @@
+[ 2026-01-17 22:48:02,886 ] - root - INFO - Starting Walmart data ingestion
+[ 2026-01-17 22:48:03,009 ] - root - INFO - Raw data files loaded
+[ 2026-01-17 22:48:03,139 ] - root - INFO - Datasets merged successfully
+[ 2026-01-17 22:48:07,525 ] - root - INFO - Data ingestion completed successfully
+[ 2026-01-17 22:48:10,343 ] - root - INFO - Data Validation completed. Status: False
