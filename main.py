@@ -5,6 +5,10 @@ from src.entity.artifact_entity.data_ingestion_artifact import DataIngestionArti
 from src.entity.config_entity.data_validation_config import DataValidationConfig
 from src.components.data_validation import DataValidation
 
+from src.entity.config_entity.data_transformation_config import DataTransformationConfig
+from src.entity.artifact_entity.data_transformation_artifact import DataTranformationArtifact
+from src.components.data_transformation import DataTransformation
+
 
 from src.entity.config_entity.training_pipeline_config import TrainingPipelineConfig
 
@@ -16,7 +20,10 @@ if __name__ == "__main__":
 
     config_validation = DataValidationConfig()
     validation = DataValidation(data_validation_config=config_validation,data_ingestion_artifact=artifact_ingestion)
-    artifact = validation.initiate_data_validation()
+    artifact_validation = validation.initiate_data_validation()
 
+    config_transformation = DataTransformationConfig()
+    transformation = DataTransformation(data_transformation_config=config_transformation,data_validation_artifact=artifact_validation)
+    artifact_transformation = transformation.initiate_data_transformation()
 
-    print(artifact)
+    print(artifact_transformation)

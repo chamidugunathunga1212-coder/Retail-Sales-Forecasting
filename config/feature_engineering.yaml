@@ -38,12 +38,16 @@ date_features:
     - dayofweek
     - is_month_start
     - is_month_end
+    - day
 
 # -----------------------------
 # Target Transformation
 # -----------------------------
 target_transform:
   type: log1p   # options: log1p | none
+
+target_rules:
+  negative_target_policy: drop 
 
 # -----------------------------
 # Missing Value Handling

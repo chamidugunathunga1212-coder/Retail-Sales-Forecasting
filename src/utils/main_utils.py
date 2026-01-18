@@ -54,7 +54,8 @@ def save_numpy_array(file_path:str,array:np.ndarray)->None:
     try:
 
         
-        os.makedirs(os.path.pardir(file_path),exist_ok=True)
+        dir_path = os.path.dirname(file_path)  
+        os.makedirs(dir_path, exist_ok=True)
         np.save(file_path,array)
         logging.info(f"Numpy array saved: {file_path}")
 

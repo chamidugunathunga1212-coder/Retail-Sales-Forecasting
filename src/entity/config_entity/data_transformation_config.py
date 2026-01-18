@@ -10,5 +10,9 @@ class DataTransformationConfig:
 
     preprocessor_path = os.path.join(transformation_dir,"preprocessor","preprocessor.pkl")
 
-    transformed_train_file_path = os.path.join(transformation_dir,"transformed","train.py")
-    transformed_test_file_path = os.path.join(transformation_dir,"transformed","test.py")
+    transformed_train_file_path = os.path.join(transformation_dir,"transformed","train")
+    transformed_test_file_path = os.path.join(transformation_dir,"transformed","test")
+
+    feature_config_path: str = os.path.join("config", "feature_engineering.yaml")
+
+    
