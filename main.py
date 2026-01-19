@@ -9,6 +9,10 @@ from src.entity.config_entity.data_transformation_config import DataTransformati
 from src.entity.artifact_entity.data_transformation_artifact import DataTranformationArtifact
 from src.components.data_transformation import DataTransformation
 
+from src.components.model_trainer import ModelTrainer
+from src.entity.config_entity.model_trainer_config import ModelTrainerConfig
+from src.entity.artifact_entity.model_trainer_artifact import ModelTrainerArtifact
+
 
 from src.entity.config_entity.training_pipeline_config import TrainingPipelineConfig
 
@@ -26,4 +30,8 @@ if __name__ == "__main__":
     transformation = DataTransformation(data_transformation_config=config_transformation,data_validation_artifact=artifact_validation)
     artifact_transformation = transformation.initiate_data_transformation()
 
-    print(artifact_transformation)
+
+    config_model_trainer_config = ModelTrainerConfig()
+    model_trainer = ModelTrainer(model_trainer_config=config_model_trainer_config,data_transformation_artifact=artifact_transformation)
+    model_trainer_artifact = model_trainer.initiate_model_trainer()
+    print(model_trainer_artifact)

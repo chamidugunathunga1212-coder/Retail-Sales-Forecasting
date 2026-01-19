@@ -280,8 +280,8 @@ class DataTransformation:
             train_arr = np.hstack([X_train_transformed, y_train.reshape(-1, 1)])
             test_arr  = np.hstack([X_test_transformed,  y_test.reshape(-1, 1)])
 
-            train_arr = np.c_[X_train_transformed,y_train]
-            test_arr = np.c_[X_test_transformed,y_test]
+            # train_arr = np.c_[X_train_transformed,y_train]
+            # test_arr = np.c_[X_test_transformed,y_test]
 
             ## save artifacts
             save_object(file_path=self.data_transformation_config.preprocessor_path,obj=preprocessor)
