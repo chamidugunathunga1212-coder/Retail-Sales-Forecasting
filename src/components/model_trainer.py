@@ -82,7 +82,7 @@ class ModelTrainer:
                 cv=cv,
                 random_state=42,
                 n_jobs=-1,
-                verbose=0
+                verbose=1
             )
 
             search.fit(X_train,y_train)
@@ -205,14 +205,14 @@ class ModelTrainer:
                         best_model = fitted_model
                         best_name = model_name
 
-                    if best_model is None:
-                        raise ValueError("No models were trained. Check config/model.yaml enabled flags.")
+            if best_model is None:
+                raise ValueError("No models were trained. Check config/model.yaml enabled flags.")
 
-                    # Save best model
+            # Save best model
 
-                    save_object(file_path=self.model_trainer_config.best_model_path,obj=best_model)
+            save_object(file_path=self.model_trainer_config.best_model_path,obj=best_model)
 
-                    logging.info(f"Best model: {best_name} rmse_log={best_rmse_log:.4f}")   
+            logging.info(f"Best model: {best_name} rmse_log={best_rmse_log:.4f}")   
 
 
             return ModelTrainerArtifact(

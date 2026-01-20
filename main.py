@@ -13,6 +13,7 @@ from src.components.model_trainer import ModelTrainer
 from src.entity.config_entity.model_trainer_config import ModelTrainerConfig
 from src.entity.artifact_entity.model_trainer_artifact import ModelTrainerArtifact
 
+from src.utils.artifact_utils import promote_to_latest
 
 from src.entity.config_entity.training_pipeline_config import TrainingPipelineConfig
 
@@ -35,3 +36,6 @@ if __name__ == "__main__":
     model_trainer = ModelTrainer(model_trainer_config=config_model_trainer_config,data_transformation_artifact=artifact_transformation)
     model_trainer_artifact = model_trainer.initiate_model_trainer()
     print(model_trainer_artifact)
+
+    promote_to_latest(src_path=artifact_transformation.preprocessor_file_path,latest_path="artifacts/latest/preprocessor/preprocessor.pkl")
+    promote_to_latest(src_path=model_trainer_artifact.best_model_path,latest_path="artifacts/latest/model/best_model.pkl")

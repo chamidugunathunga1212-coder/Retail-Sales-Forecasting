@@ -8,3 +8,6 @@ End-to-end machine learning project with MLOps practices.
 - MLflow
 - FastAPI
 - Docker
+
+
+uvicorn app:app --reload
