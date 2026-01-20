@@ -2,18 +2,22 @@ name: RETAIL_SALES_PREDICTION-ML-CICD
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
 
 env:
   AWS_REGION: ap-south-1
-  ECR_REPOSITORY: retail-sales-api
+  ECR_REPOSITORY_NAME: retail-sales-api
   CONTAINER_NAME: retail-sale-api
   APP_PORT: "8000"
 
 jobs:
+  # ------------------------
+  # Continuous Integration
+  # ------------------------
   integration:
-    name: Continuous Integration
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
@@ -28,7 +32,42 @@ jobs:
           pip install -r requirements.txt
 
       - name: Lint (placeholder)
-        run: echo "Add ruff/flake8 here"
+        run: echo "Add ruff / flake8 here"
 
       - name: Tests (placeholder)
         run: echo "Add pytest here"
+
+  # ------------------------
+  # Build & Push to ECR
+  # ------------------------
+  build-and-push:
+    needs: integration
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and Push Docker Image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          IMAGE_URI=$ECR_REGISTRY/${{ env.ECR_REPOSITORY_NAME }}:$IMAGE_TAG
+
+          docker build -t $IMAGE_URI .
+          docker push $IMAGE_URI
+
+          # push latest tag also
+          docker tag $IMAGE_URI $ECR_REGISTRY/${{ env.ECR_REPOSITORY_NAME }}:latest
+          docker push $ECR_REGISTRY/${{ env.ECR_REPOSITORY_NAME }}:latest
