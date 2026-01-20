@@ -7,8 +7,8 @@ on:
 
 env:
   AWS_REGION: us-east-1
-  ECR_REPOSITORY_NAME: retail-sales-api
-  CONTAINER_NAME: retail-sales
+  ECR_REPOSITORY_NAME: retail-sales
+  CONTAINER_NAME: CONTAINER_NAME
   APP_PORT: "8000"
 
 jobs:
