@@ -17,6 +17,8 @@ from src.utils.artifact_utils import promote_to_latest
 
 from src.entity.config_entity.training_pipeline_config import TrainingPipelineConfig
 
+from src.cloud.s3_syncer import S3Sync
+
 if __name__ == "__main__":
     config_ingestion = DataIngesionConfig()
     ingestion = DataIngestion(config_ingestion)
@@ -39,3 +41,16 @@ if __name__ == "__main__":
 
     promote_to_latest(src_path=artifact_transformation.preprocessor_file_path,latest_path="artifacts/latest/preprocessor/preprocessor.pkl")
     promote_to_latest(src_path=model_trainer_artifact.best_model_path,latest_path="artifacts/latest/model/best_model.pkl")
+
+
+    s3_sync = S3Sync()
+    TRAINING_BUCKET_NAME = "myretailsalesforecasting"
+
+    aws_bucket_url = f"s3://{TRAINING_BUCKET_NAME}/artifacts/{TrainingPipelineConfig.timestamp}"
+    s3_sync.sync_folder_to_s3(folder = TrainingPipelineConfig.artifact_dir,aws_bucket_url=aws_bucket_url)
+
+    # 2) upload ONLY latest (recommended for EC2 serving)
+    aws_bucket_url_latest = f"s3://{TRAINING_BUCKET_NAME}/artifacts/latest"
+    s3_sync.sync_folder_to_s3(folder="artifacts/latest",aws_bucket_url=aws_bucket_url_latest)
+
+    print("Artifact folder saved sucessfully...")

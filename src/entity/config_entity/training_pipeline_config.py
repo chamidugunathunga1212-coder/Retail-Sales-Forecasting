@@ -5,4 +5,6 @@ from datetime import datetime
 @dataclass
 class TrainingPipelineConfig:
 
-    artifact_dir: str = os.path.join("artifacts",datetime.now().strftime("%m_%d_%Y_%H_%M_%S"))
+    timestamp = datetime.now().strftime("%m_%d_%Y_%H_%M_%S")
+
+    artifact_dir: str = os.path.join("artifacts",timestamp)
