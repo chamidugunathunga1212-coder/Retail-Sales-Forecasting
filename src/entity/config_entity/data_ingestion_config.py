@@ -16,4 +16,7 @@ class DataIngesionConfig:
 
     test_size = 0.2
 
+
+    
+
     
