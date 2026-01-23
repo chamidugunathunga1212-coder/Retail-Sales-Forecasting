@@ -1,48 +1,163 @@
+# name: RETAIL_SALES_PREDICTION-ML-CICD
+
+# on:
+#   push:
+#     branches:
+#       - main
+
+# env:
+#   AWS_REGION: us-east-1
+#   ECR_REPOSITORY_NAME: retail-sales
+#   CONTAINER_NAME: CONTAINER_NAME
+#   APP_PORT: "8000"
+
+# jobs:
+#   # ------------------------
+#   # Continuous Integration
+#   # ------------------------
+#   integration:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - uses: actions/checkout@v4
+
+#       - name: Set up Python
+#         uses: actions/setup-python@v5
+#         with:
+#           python-version: "3.10"
+
+#       - name: Install dependencies
+#         run: |
+#           python -m pip install --upgrade pip
+#           pip install -r requirements.txt
+
+#       - name: Lint (placeholder)
+#         run: echo "Add ruff / flake8 here"
+
+#       - name: Tests (placeholder)
+#         run: echo "Add pytest here"
+
+#   # ------------------------
+#   # Build & Push to ECR
+#   # ------------------------
+#   build-and-push:
+#     needs: integration
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - uses: actions/checkout@v4
+
+#       - name: Configure AWS credentials
+#         uses: aws-actions/configure-aws-credentials@v4
+#         with:
+#           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#           aws-region: ${{ env.AWS_REGION }}
+
+#       - name: Login to Amazon ECR
+#         id: login-ecr
+#         uses: aws-actions/amazon-ecr-login@v2
+
+#       - name: Build and Push Docker Image
+#         env:
+#           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+#           IMAGE_TAG: ${{ github.sha }}
+#         run: |
+#           IMAGE_URI=$ECR_REGISTRY/${{ env.ECR_REPOSITORY_NAME }}:$IMAGE_TAG
+
+#           docker build -t $IMAGE_URI .
+#           docker push $IMAGE_URI
+
+#           # push latest tag also
+#           docker tag $IMAGE_URI $ECR_REGISTRY/${{ env.ECR_REPOSITORY_NAME }}:latest
+#           docker push $ECR_REGISTRY/${{ env.ECR_REPOSITORY_NAME }}:latest
+
+          
+
+#   # ------------------------
+#   # Deploy to EC2
+#   # ------------------------
+#   deploy:
+#     needs: build-and-push
+#     runs-on: self-hosted
+
+#     steps:
+#       - name: Configure AWS credentials
+#         uses: aws-actions/configure-aws-credentials@v4
+#         with:
+#           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#           aws-region: ${{ env.AWS_REGION }}
+
+#       - name: Login to Amazon ECR
+#         id: login-ecr
+#         uses: aws-actions/amazon-ecr-login@v2
+
+#       - name: Pull and Restart Container
+#         env:
+#           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+#           IMAGE_TAG: ${{ github.sha }}
+#         run: |
+#           set -e
+
+#           IMAGE_URI=$ECR_REGISTRY/${{ env.ECR_REPOSITORY_NAME }}:$IMAGE_TAG
+
+#           docker pull $IMAGE_URI
+
+#           docker rm -f ${{ env.CONTAINER_NAME }} || true
+
+#           docker run -d \
+#             --name ${{ env.CONTAINER_NAME }} \
+#             --restart unless-stopped \
+#             -p ${{ env.APP_PORT }}:8000 \
+#             $IMAGE_URI
+
+#       - name: Verify deployment
+#         run: |
+#           sleep 5
+#           curl -f http://localhost:${{ env.APP_PORT }}/health
+
+#       - name: Cleanup
+#         run: docker system prune -f
+
+
+
 name: RETAIL_SALES_PREDICTION-ML-CICD
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
 
 env:
   AWS_REGION: us-east-1
   ECR_REPOSITORY_NAME: retail-sales
-  CONTAINER_NAME: CONTAINER_NAME
-  APP_PORT: "8000"
+  CONTAINER_NAME: retail-sale-api
+  HOST_PORT: "80"
+  CONTAINER_PORT: "8080"
 
 jobs:
-  # ------------------------
-  # Continuous Integration
-  # ------------------------
   integration:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
-
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-
       - name: Lint (placeholder)
         run: echo "Add ruff / flake8 here"
-
       - name: Tests (placeholder)
         run: echo "Add pytest here"
 
-  # ------------------------
-  # Build & Push to ECR
-  # ------------------------
   build-and-push:
     needs: integration
     runs-on: ubuntu-latest
+    outputs:
+      image_uri: ${{ steps.out.outputs.image_uri }}
 
     steps:
       - uses: actions/checkout@v4
@@ -58,64 +173,52 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build and Push Docker Image
+      - name: Build and push image (sha + latest)
+        id: out
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
           IMAGE_URI=$ECR_REGISTRY/${{ env.ECR_REPOSITORY_NAME }}:$IMAGE_TAG
-
           docker build -t $IMAGE_URI .
           docker push $IMAGE_URI
 
-          # push latest tag also
           docker tag $IMAGE_URI $ECR_REGISTRY/${{ env.ECR_REPOSITORY_NAME }}:latest
           docker push $ECR_REGISTRY/${{ env.ECR_REPOSITORY_NAME }}:latest
 
-          
+          echo "image_uri=$IMAGE_URI" >> $GITHUB_OUTPUT
 
-  # ------------------------
-  # Deploy to EC2
-  # ------------------------
   deploy:
     needs: build-and-push
     runs-on: self-hosted
 
     steps:
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
-
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-
-      - name: Pull and Restart Container
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          IMAGE_TAG: ${{ github.sha }}
+      - name: Login to ECR
         run: |
-          set -e
+          aws ecr get-login-password --region us-east-1 | \
+          docker login --username AWS --password-stdin 621536849607.dkr.ecr.us-east-1.amazonaws.com
 
-          IMAGE_URI=$ECR_REGISTRY/${{ env.ECR_REPOSITORY_NAME }}:$IMAGE_TAG
+      - name: Pull latest image
+        run: |
+          docker pull 621536849607.dkr.ecr.us-east-1.amazonaws.com/retail-sales:latest
 
-          docker pull $IMAGE_URI
+      - name: Sync latest artifacts
+        run: |
+          sudo mkdir -p /opt/retail_sales/artifacts/latest
+          sudo chown -R ubuntu:ubuntu /opt/retail_sales
+          aws s3 sync s3://myretailsalesforecasting/artifacts/latest/ /opt/retail_sales/artifacts/latest/
 
-          docker rm -f ${{ env.CONTAINER_NAME }} || true
-
-          docker run -d \
-            --name ${{ env.CONTAINER_NAME }} \
+      - name: Restart container
+        run: |
+          docker rm -f retail-sale-api || true
+          docker run -d --name retail-sale-api \
             --restart unless-stopped \
-            -p ${{ env.APP_PORT }}:8000 \
-            $IMAGE_URI
+            -p 80:8080 \
+            -e ARTIFACT_DIR=/app/artifacts/latest \
+            -v /opt/retail_sales/artifacts/latest:/app/artifacts/latest:ro \
+            621536849607.dkr.ecr.us-east-1.amazonaws.com/retail-sales:latest
 
-      - name: Verify deployment
+      - name: Verify
         run: |
           sleep 5
-          curl -f http://localhost:${{ env.APP_PORT }}/health
-
-      - name: Cleanup
-        run: docker system prune -f
+          curl -I http://localhost
