@@ -187,7 +187,6 @@ jobs:
           docker push $ECR_REGISTRY/${{ env.ECR_REPOSITORY_NAME }}:latest
 
           echo "image_uri=$IMAGE_URI" >> $GITHUB_OUTPUT
-
   deploy:
     needs: build-and-push
     runs-on: self-hosted
@@ -195,21 +194,25 @@ jobs:
     steps:
       - name: Login to ECR
         run: |
+          set -e
           aws ecr get-login-password --region us-east-1 | \
           docker login --username AWS --password-stdin 621536849607.dkr.ecr.us-east-1.amazonaws.com
 
       - name: Pull latest image
         run: |
+          set -e
           docker pull 621536849607.dkr.ecr.us-east-1.amazonaws.com/retail-sales:latest
 
       - name: Sync latest artifacts
         run: |
+          set -e
           sudo mkdir -p /opt/retail_sales/artifacts/latest
           sudo chown -R ubuntu:ubuntu /opt/retail_sales
           aws s3 sync s3://myretailsalesforecasting/artifacts/latest/ /opt/retail_sales/artifacts/latest/
 
       - name: Restart container
         run: |
+          set -e
           docker rm -f retail-sale-api || true
           docker run -d --name retail-sale-api \
             --restart unless-stopped \
@@ -220,5 +223,10 @@ jobs:
 
       - name: Verify
         run: |
-          sleep 5
-          curl -I http://localhost
+          set -e
+          sleep 10
+          echo "Containers:"
+          docker ps
+          echo "Health check:"
+          curl -f http://localhost/health
+          echo "OK"
