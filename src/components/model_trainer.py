@@ -12,6 +12,7 @@ from src.exception.exception import CustomerException
 from src.utils.main_utils import load_numpy_array_data,save_object,read_yaml
 
 from src.utils.model_eval_utils import rmse, inverse_log1p
+from sklearn.metrics import r2_score
 
 from src.entity.config_entity.model_trainer_config import ModelTrainerConfig
 from src.entity.artifact_entity.model_trainer_artifact import ModelTrainerArtifact
@@ -82,7 +83,7 @@ class ModelTrainer:
                 cv=cv,
                 random_state=42,
                 n_jobs=-1,
-                verbose=1
+                verbose=0
             )
 
             search.fit(X_train,y_train)
@@ -170,6 +171,9 @@ class ModelTrainer:
                     y_test_original = inverse_log1p(y_test_log)
                     preds_original = inverse_log1p(preds_log)
 
+                    ## calculate the r2 score
+                    r2_scr = r2_score(y_true=y_test_original,y_pred=preds_original)
+
                     scoring_original = rmse(y_test_original,preds_original)
 
 
@@ -184,6 +188,7 @@ class ModelTrainer:
                         mlflow.log_param("tuning_cv", tuning_info.get("cv"))
                         mlflow.log_param("tuning_n_iter", tuning_info.get("n_iter"))
                         mlflow.log_param("tuning_scoring", tuning_info.get("scoring"))
+                        mlflow.log_metric("r2 score",r2_scr)
                         mlflow.log_metric("best_cv_score", float(tuning_info.get("best_cv_score")))
 
                     else:

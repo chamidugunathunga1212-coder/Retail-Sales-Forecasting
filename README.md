@@ -97,6 +97,7 @@ FastAPI Inference
 **Metrics**
 - RMSE (log scale)
 - RMSE (original sales scale)
+- r2 score
 
 ---
 
