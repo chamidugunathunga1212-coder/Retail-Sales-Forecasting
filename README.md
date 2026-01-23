@@ -136,5 +136,6 @@ pip install -r requirements.txt
 python main.py
 uvicorn app:app --reload
 
-http://127.0.0.1:8000/docs
+## deploy url
+http://52.91.216.181/docs
 
